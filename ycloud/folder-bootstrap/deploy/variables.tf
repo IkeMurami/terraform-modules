@@ -47,3 +47,9 @@ variable "network" {
     subnetwork-name = "subnet-a"
   }
 }
+
+variable "logging-group-name" {
+  description = "Логи сервиса"
+  type        = string
+  default     = "logs"
+}

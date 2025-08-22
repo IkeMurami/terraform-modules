@@ -1,5 +1,5 @@
 init:
-	@export YC_TOKEN="$(yc iam create-token)"
+	# @export YC_TOKEN="$(yc iam create-token)"
 	@terraform -chdir=./deploy init
 
 plan:

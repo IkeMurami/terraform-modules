@@ -13,3 +13,7 @@ output "subnet-id" {
 output "container-registry-id" {
   value = yandex_container_registry.default.id
 }
+
+output "logging-group-id" {
+  value = yandex_logging_group.group.id
+}
