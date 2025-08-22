@@ -1,11 +1,3 @@
-variable "cloud-id" {
-  type = string
-}
-
-variable "folder-id" {
-  type = string
-}
-
 variable "domain" {
   description = "Информация о домене"
   type = object({
