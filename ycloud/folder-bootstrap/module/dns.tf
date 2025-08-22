@@ -8,6 +8,4 @@ resource "yandex_dns_zone" "domain-zone" {
 
   zone   = "${var.parent-domain.domain}."
   public = true
-
-  provider = yandex.with-project-info
 }

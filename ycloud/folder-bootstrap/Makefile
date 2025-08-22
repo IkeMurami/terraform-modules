@@ -1,15 +1,15 @@
 init:
 	# @export YC_TOKEN="$(yc iam create-token)"
-	@terraform -chdir=./deploy init
+	@terraform init
 
 plan:
-	@terraform -chdir=./deploy get -update=true
-	@terraform -chdir=./deploy fmt -recursive
-	@terraform -chdir=./deploy validate
-	@terraform -chdir=./deploy plan -var-file ../variables.tfvars
+	@terraform get -update=true
+	@terraform fmt -recursive
+	@terraform validate
+	@terraform plan -var-file variables.tfvars
 
 apply:
-	@terraform -chdir=./deploy apply -var-file ../variables.tfvars
+	@terraform apply -var-file variables.tfvars
 
 destroy:
-	@terraform -chdir=./deploy destroy -var-file ../variables.tfvars
+	@terraform destroy -var-file variables.tfvars
