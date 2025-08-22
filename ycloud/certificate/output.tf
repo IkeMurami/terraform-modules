@@ -1,23 +1,23 @@
 output "cert_id" {
   description = "Certificate ID"
-  value       = data.yandex_cm_certificate.cert-domain.id
+  value       = module.certificate.cert_id
 }
 
 output "chain" {
-  value = join("\n", data.yandex_cm_certificate_content.cert-domain-content.certificates)
+  value = module.certificate.chain
 }
 
 output "privkey" {
-  value     = data.yandex_cm_certificate_content.cert-domain-content.private_key
+  value     = module.certificate.privkey
   sensitive = true
 }
 
-data "local_file" "chain" {
+resource "local_file" "chain" {
   filename = "${path.module}/fullchain.pem"
-  content  = join("\n", data.yandex_cm_certificate_content.cert-domain-content.certificates)
+  content  = module.certificate.chain
 }
 
-data "local_sensitive_file" "privkey" {
+resource "local_sensitive_file" "privkey" {
   filename = "${path.module}/privkey.pem"
-  content  = data.yandex_cm_certificate_content.cert-domain-content.private_key
+  content  = module.certificate.privkey
 }

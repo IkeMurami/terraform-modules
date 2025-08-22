@@ -10,17 +10,8 @@ terraform {
   required_version = ">= 0.13"
 }
 
-data "yandex_resourcemanager_cloud" "cloud" {
-  name = var.cloud-name
-}
-
-data "yandex_resourcemanager_folder" "folder" {
-  cloud_id = data.yandex_resourcemanager_cloud.cloud.id
-  name     = var.folder-name
-}
-
 provider "yandex" {
   alias     = "with-project-info"
-  cloud_id  = data.yandex_resourcemanager_cloud.cloud.id
-  folder_id = data.yandex_resourcemanager_folder.folder.id
+  cloud_id  = var.cloud-id
+  folder_id = var.folder-id
 }
