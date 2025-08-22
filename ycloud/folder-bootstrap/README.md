@@ -20,3 +20,7 @@ make apply
 - ID сети и подсети — `network-id` и `subnet-id`
 - Service Account ID (`service-account-id`) с выданными правами на запись логов и скачивание образов из registry
 - ID хранилища с логами (`logging-group-id`)
+
+## Используем как модуль
+
+См [main.tf](./main.tf)
