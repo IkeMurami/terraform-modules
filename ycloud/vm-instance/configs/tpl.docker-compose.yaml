@@ -74,6 +74,7 @@ services:
 
 networks:
   service-network:
+    name: service-network  # Задаем конкретное имя сети, чтобы его могли использовать в других docker compose конфигурациях
 
 # Диск для Postgres
 x-yc-disks:
