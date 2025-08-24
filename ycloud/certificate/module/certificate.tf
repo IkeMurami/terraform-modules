@@ -6,7 +6,10 @@ data "yandex_dns_zone" "domain-zone" {
 # https://yandex.cloud/ru/docs/certificate-manager/tf-ref
 resource "yandex_cm_certificate" "cert-domain" {
   name    = "cert-domain"
-  domains = [var.domain.value]
+  domains = [
+    var.domain.value,
+    "*.${var.domain.value}"
+  ]
 
   managed {
     challenge_type  = "DNS_CNAME"
