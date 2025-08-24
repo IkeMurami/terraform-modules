@@ -29,7 +29,7 @@ resource "yandex_compute_disk" "postgres_data_disk" {
 }
 
 resource "yandex_compute_instance" "instance" {
-  name = "api-gateway"
+  name = "vm-instance"
 
   platform_id = "standard-v3" # Intel Ice Lake, https://yandex.cloud/ru/docs/compute/concepts/vm-platforms
   zone        = var.zone
