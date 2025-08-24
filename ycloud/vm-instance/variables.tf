@@ -1,33 +1,43 @@
-variable "cloud-init" {
-  description = "cloud-init config"
+locals {
+  environment            = "testing"
+  app-name               = "service"
+  device-name            = "${local.app-name}-pgdata"
+  default-user           = "yc-user"
+  ssh-key                = "${path.module}/ycvm"
+  postgres-password-hash = sha256("${var.postgres-secrets.password}-${local.environment}")
+  # Перекладываю сертификаты в локальную переменную, так при запуске из консоли нет возможности передать
+  # в переменную модуля содержимое файла (да и в целом, это надо только тут)
+  certificate = {
+    chain   = var.certificate.chain != "" ? var.certificate.chain : file("${path.module}/fullchain.pem")
+    privkey = var.certificate.privkey != "" ? var.certificate.privkey : file("${path.module}/privkey.pem")
+  }
+}
+
+variable "cloud-id" {
+  type = string
+}
+
+variable "folder-id" {
+  type = string
+}
+
+variable "zone" {
+  description = "В каком DC разместить сервис"
+  type        = string
+  # default     = "ru-central1-a"
+}
+
+variable "service-account-id" {
+  # Roles:
+  # - container-registry.images.puller
+  # - logging.writer
+
+  description = "Service Account"
   type        = string
 }
 
-variable "docker-compose" {
-  description = "Docker compose config"
-  type        = string
-}
-
-variable "device-name" {
-  description = "Postgres disk name: этот параметр для провязки диска в конфигурации и внутри контейнера / docker compose"
-  type        = string
-}
-
-variable "postgres-password-hash" {
-  # Сменили пароль — диск с данными пересоздаем?
-  # Пока не знаю как лучше
-  description = "Хеш пароля к Postgres"
-  type        = string
-  sensitive   = true
-}
-
-variable "sa-id" {
-  description = "ID SA с ролью container-registry.images.puller"
-  type        = string
-}
-
-variable "sg-id" {
-  description = "Security Group ID"
+variable "network-id" {
+  description = "VPC Network ID"
   type        = string
 }
 
@@ -36,17 +46,51 @@ variable "subnet-id" {
   type        = string
 }
 
-variable "zone" {
-  description = "DC zone"
+variable "logging-group-id" {
+  description = "Logging group ID"
   type        = string
 }
 
-variable "default-user" {
-  description = "SSH user"
-  type        = string
+variable "postgres-config" {
+  description = "Postgres Config"
+  type = object({
+    # Это имя контейнера, а не реальный хост!
+    local-host = string
+    # Вообще, это константа, на нее мы не влияем, но нам ее надо перекидывать
+    local-port  = number
+    remote-port = number
+  })
 }
 
-variable "ssh-key" {
-  description = "ssh key path"
-  type        = string
+variable "postgres-secrets" {
+  description = "Postgres credentials"
+  type = object({
+    db       = string
+    user     = string
+    password = string
+  })
+  sensitive = true
+}
+
+variable "certificate" {
+  description = "TLS Certificate"
+  type = object({
+    chain   = string
+    privkey = string
+  })
+  sensitive = true
+  default = {
+    chain   = ""
+    privkey = ""
+  }
+}
+
+variable "services" {
+  description = "Какие сервисы поднять в nginx"
+  type = list(object({
+    domain      = string
+    name        = string
+    docker_host = string
+    docker_port = number
+  }))
 }

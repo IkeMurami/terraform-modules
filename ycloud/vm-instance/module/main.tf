@@ -1,5 +1,6 @@
 module "app" {
-  source = "git::https://github.com/IkeMurami/terraform-modules.git//ycloud/vm-instance"
+  # source = "git::https://github.com/IkeMurami/terraform-modules.git//ycloud/vm-instance"
+  source = "./vm-instance"
 
   cloud-init     = data.cloudinit_config.cloud-init.rendered
   docker-compose = var.docker-compose

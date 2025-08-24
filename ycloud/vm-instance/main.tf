@@ -1,79 +1,26 @@
-data "yandex_compute_image" "container-optimized-image" {
-  family = "container-optimized-image"
-}
+module "service" {
+  source = "./module"
 
-# Чтобы instance был доступен из сети
-resource "yandex_vpc_address" "addr" {
-  name = "instance-adress"
-  external_ipv4_address {
-    zone_id = var.zone
-  }
-}
+  zone               = var.zone
+  service-account-id = var.service-account-id
 
-resource "terraform_data" "postgres-password-hash" {
-  input = var.postgres-password-hash
-}
+  device-name      = local.device-name
+  logging-group-id = var.logging-group-id
 
-# Диск для данных PostgreSQL
-resource "yandex_compute_disk" "postgres_data_disk" {
-  name = "pg-data-disk"
-  type = "network-hdd"
-  zone = var.zone
-  size = 10
+  # Connection
+  default-user    = local.default-user
+  vm-ssh-key-path = local.ssh-key
 
-  lifecycle {
-    replace_triggered_by = [
-      terraform_data.postgres-password-hash
-    ]
-  }
-}
+  # Network
+  network-id = var.network-id
+  subnet-id  = var.subnet-id
 
-resource "yandex_compute_instance" "instance" {
-  name = "vm-instance"
+  # Service configs
+  postgres-password-hash = local.postgres-password-hash
+  cloud-init-yaml        = local.cloud-init-yaml
+  docker-compose         = local.docker-compose
 
-  platform_id = "standard-v3" # Intel Ice Lake, https://yandex.cloud/ru/docs/compute/concepts/vm-platforms
-  zone        = var.zone
-
-  service_account_id = var.sa-id
-  resources {
-    core_fraction = 50 # 50%
-    cores         = 2
-    memory        = 2
-  }
-
-  boot_disk {
-    initialize_params {
-      image_id = data.yandex_compute_image.container-optimized-image.id
-    }
-  }
-
-  secondary_disk {
-    disk_id     = yandex_compute_disk.postgres_data_disk.id
-    device_name = var.device-name
-  }
-
-  network_interface {
-    subnet_id = var.subnet-id
-    # Управляем, какие порты открываем
-    security_group_ids = [
-      var.sg-id
-    ]
-
-    # Если хотим открыть наружу (дать публичный адрес)
-    nat            = true
-    nat_ip_address = yandex_vpc_address.addr.external_ipv4_address[0].address
-  }
-
-  connection {
-    host        = yandex_vpc_address.addr.external_ipv4_address[0].address
-    user        = var.default-user
-    type        = "ssh"
-    private_key = file(var.ssh-key)
-    timeout     = "2m"
-  }
-
-  metadata = {
-    docker-compose = var.docker-compose
-    user-data      = var.cloud-init
+  providers = {
+    yandex = yandex.with-project-info
   }
 }
