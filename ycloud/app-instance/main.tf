@@ -1,17 +1,26 @@
-module "app" {
-    source = "git::https://github.com/IkeMurami/terraform-modules.git//ycloud/vm-instance"
+module "service" {
+  source = "./module"
 
-    cloud-init = data.cloudinit_config.cloud-init.rendered
-    docker-compose = var.docker-compose
+  zone               = var.zone
+  service-account-id = var.service-account-id
 
-    sa-id = var.service-account-id
-    sg-id = yandex_vpc_security_group.instance-security-group.id
+  device-name      = local.device-name
+  logging-group-id = var.logging-group-id
 
-    subnet-id = var.subnet-id
-    zone = var.zone
-    device-name = var.device-name
+  # Connection
+  default-user    = local.default-user
+  vm-ssh-key-path = local.ssh-key
 
-    postgres-password-hash = var.postgres-password-hash
-    default-user = var.default-user
-    ssh-key      = var.vm-ssh-key-path
+  # Network
+  network-id = var.network-id
+  subnet-id  = var.subnet-id
+
+  # Service configs
+  postgres-password-hash = local.postgres-password-hash
+  cloud-init-yaml        = local.cloud-init-yaml
+  docker-compose         = local.docker-compose
+
+  providers = {
+    yandex = yandex.with-project-info
+  }
 }

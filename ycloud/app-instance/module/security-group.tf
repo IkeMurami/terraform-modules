@@ -2,7 +2,7 @@
 
 resource "yandex_vpc_security_group" "instance-security-group" {
   # https://yandex.cloud/ru/docs/vpc/concepts/security-groups
-  name       = "${var.app-name}-security-group"
+  name       = "app-security-group"
   network_id = var.network-id
 
   ingress {
